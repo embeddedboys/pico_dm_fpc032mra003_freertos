@@ -26,17 +26,17 @@
 # Set all global variables here
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(OVERCLOCK_ENABLED 1)    # 1: enable, 0: disable
+set(OVERCLOCK_ENABLED 0)    # 1: enable, 0: disable
 
 if(OVERCLOCK_ENABLED)
-    message(WARNING "Overclocking is enabled. This may damage your device. Use at your own risk.")
+    message(WARNING "Overclocking is enabled. This may damage your device. Use at own risk.")
     # Overclocking profiles
     #      SYS_CLK  | FLASH_CLK | Voltage
     #  1  | 266MHz  |  133MHz   |  1.10(V) (default, stable, recommended for most devices)
     #  2  | 240MHz  |  120MHZ   |  1.10(V) (more stable)
     #  3  | 360MHz  |  90MHz    |  1.20(V)
     #  4  | 400MHz  |  100MHz   |  1.25(V)
-    set(OVERCLOCK_PROFILE 4)
+    set(OVERCLOCK_PROFILE 2)
 
     if(OVERCLOCK_PROFILE EQUAL 1)
         set(SYS_CLK_KHZ 266000)             # CPU clock speed
@@ -61,13 +61,16 @@ endif()
 
 # LCD Pins for 8080 interface
 set(LCD_PIN_DB_BASE  0)  # 8080 LCD data bus base pin
-set(LCD_PIN_DB_COUNT 16) # 8080 LCD data bus pin count
+set(LCD_PIN_DB_COUNT 8) # 8080 LCD data bus pin count
 set(LCD_PIN_CS  18)  # 8080 LCD chip select pin
 set(LCD_PIN_WR  19)  # 8080 LCD write pin
 set(LCD_PIN_RS  20)  # 8080 LCD register select pin
 set(LCD_PIN_RST 22)  # 8080 LCD reset pin
 set(LCD_PIN_BL  28)  # 8080 LCD backlight pin
+set(LCD_HOR_RES 240)
+set(LCD_VER_RES 240)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
+set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
 
 SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--print-memory-usage")
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--print-memory-usage")
@@ -85,6 +88,10 @@ add_subdirectory(pio)
 target_compile_definitions(pio_i80 PUBLIC LCD_PIN_RS=${LCD_PIN_RS})
 target_compile_definitions(pio_i80 PUBLIC LCD_PIN_CS=${LCD_PIN_CS})
 target_compile_definitions(pio_i80 PUBLIC DEFAULT_PIO_CLK_KHZ=${PERI_CLK_KHZ})
+target_compile_definitions(pio_i80 PUBLIC PIO_USE_DMA=${PIO_USE_DMA})
+
+set(I80_BUS_WR_CLK_KHZ 10000)
+target_compile_definitions(pio_i80 PUBLIC I80_BUS_WR_CLK_KHZ=${I80_BUS_WR_CLK_KHZ})
 
 # include factory test library here
 add_subdirectory(factory)
@@ -92,7 +99,8 @@ add_subdirectory(factory)
 # user define common source files
 file(GLOB_RECURSE COMMON_SOURCES
     main.c
-    ili9488.c
+    tft.c
+    tft_patch.c
     ft6236.c
     porting/lv_port_disp_template.c
     porting/lv_port_indev_template.c
@@ -100,13 +108,13 @@ file(GLOB_RECURSE COMMON_SOURCES
     backlight.c
 )
 
-add_executable(${ProjectName} ${COMMON_SOURCES})
+add_executable(${PROJECT_NAME} ${COMMON_SOURCES})
 
-target_include_directories(${ProjectName} PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-target_link_libraries(${ProjectName} 
+target_link_libraries(${PROJECT_NAME} 
     pico_stdlib
     pico_multicore
     FreeRTOS-Kernel-Heap3
@@ -119,16 +127,18 @@ target_link_libraries(${ProjectName}
     )
 
 # add target common defines here
-target_compile_definitions(${ProjectName} PUBLIC DEFAULT_SYS_CLK_KHZ=${SYS_CLK_KHZ})
-target_compile_definitions(${ProjectName} PUBLIC DEFAULT_PERI_CLK_KHZ=${PERI_CLK_KHZ})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_DB_BASE=${LCD_PIN_DB_BASE})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_DB_COUNT=${LCD_PIN_DB_COUNT})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_CS=${LCD_PIN_CS})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_WR=${LCD_PIN_WR})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_RS=${LCD_PIN_RS})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_RST=${LCD_PIN_RST})
-target_compile_definitions(${ProjectName} PUBLIC LCD_PIN_BL=${LCD_PIN_BL})
-target_compile_definitions(${ProjectName} PUBLIC DISP_OVER_PIO=${DISP_OVER_PIO})
+target_compile_definitions(${PROJECT_NAME} PUBLIC DEFAULT_SYS_CLK_KHZ=${SYS_CLK_KHZ})
+target_compile_definitions(${PROJECT_NAME} PUBLIC DEFAULT_PERI_CLK_KHZ=${PERI_CLK_KHZ})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_DB_BASE=${LCD_PIN_DB_BASE})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_DB_COUNT=${LCD_PIN_DB_COUNT})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_CS=${LCD_PIN_CS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_WR=${LCD_PIN_WR})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RS=${LCD_PIN_RS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RST=${LCD_PIN_RST})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_BL=${LCD_PIN_BL})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_HOR_RES=${LCD_HOR_RES})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_VER_RES=${LCD_VER_RES})
+target_compile_definitions(${PROJECT_NAME} PUBLIC DISP_OVER_PIO=${DISP_OVER_PIO})
 
 # Note: If you are using a NOR flash like "w25q16". Just keep the following content.
 # The maximum speed of "w25q16" is 133MHz, However, the clock speed of XIP QSPI is divided from "sys_clk".
@@ -142,9 +152,9 @@ else()
 endif()
 math(EXPR FLASH_CLK_KHZ "${SYS_CLK_KHZ} / ${PICO_FLASH_SPI_CLKDIV}")
 target_compile_definitions(bs2_default PRIVATE PICO_FLASH_SPI_CLKDIV=${PICO_FLASH_SPI_CLKDIV})
-target_compile_definitions(${ProjectName} PRIVATE FLASH_CLK_KHZ=${FLASH_CLK_KHZ})
+target_compile_definitions(${PROJECT_NAME} PRIVATE FLASH_CLK_KHZ=${FLASH_CLK_KHZ})
 
-pico_enable_stdio_usb(${ProjectName} 0)
-pico_enable_stdio_uart(${ProjectName} 1)
+pico_enable_stdio_usb(${PROJECT_NAME} 0)
+pico_enable_stdio_uart(${PROJECT_NAME} 1)
 
-pico_add_extra_outputs(${ProjectName})
+pico_add_extra_outputs(${PROJECT_NAME})

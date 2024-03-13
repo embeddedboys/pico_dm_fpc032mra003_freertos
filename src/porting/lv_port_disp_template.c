@@ -83,7 +83,7 @@ void lv_port_disp_init(void)
      */
 
 /* a half screen disp buffer */
-#define MY_DISP_BUF_SIZE    (MY_DISP_HOR_RES * MY_DISP_VER_RES / 4)
+#define MY_DISP_BUF_SIZE    (MY_DISP_HOR_RES * MY_DISP_VER_RES / 2)
 // #define MY_DISP_BUF_SIZE    (MY_DISP_HOR_RES * 10)
 
     /* Example for 1) */
@@ -143,7 +143,7 @@ void lv_port_disp_init(void)
 static void disp_init(void)
 {
     /*You code here*/
-    ili9488_driver_init();
+    tft_driver_init();
 }
 
 volatile bool disp_flush_enabled = true;
@@ -179,10 +179,10 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
             .ys = area->y1,
             .xe = area->x2,
             .ye = area->y2,
-            .vmem16 = (void *)color_p,
+            .vmem = (void *)color_p,
             .len = lv_area_get_size(area),
         };
-        ili9488_async_video_flush(&vf);
+        tft_async_video_flush(&vf);
     }
 
     /*IMPORTANT!!!
