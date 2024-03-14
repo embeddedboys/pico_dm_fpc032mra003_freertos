@@ -1,4 +1,15 @@
-# rp2040-freertos-template
-This is a template project for developing FreeRTOS based applications on Raspberry Pi RP2040 based boards. This template uses the "official" RP2040 port from the Raspberry Pi Foundation. My previous repo used the generic Cortex M0 port so this one corrects that. Previous Repo retained as tutorials rely on it. 
+# Pico DM 8080 Template
 
-Unmodified, this project will spawn a single task to rapidly blink the LED on and off.
+## TODO list
+
+- [x] Overclocking profile support
+
+- [ ] dynamic frequency modifier
+
+- [x] 8080 PIO All in one
+
+- [x] TFT driver framework
+
+- [ ] Input driver framework
+
+present by embeddedboys developers
