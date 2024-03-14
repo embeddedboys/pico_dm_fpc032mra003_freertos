@@ -93,7 +93,7 @@ int main(void)
 
     printf("\n\n\nPICO DM QD3503728 LVGL Porting\n");
 
-    xToFlushQueue = xQueueCreate(1, sizeof(struct video_frame));
+    xToFlushQueue = xQueueCreate(2, sizeof(struct video_frame));
     
 extern int tft_driver_init(void);
 
@@ -107,11 +107,11 @@ extern int tft_driver_init(void);
     printf("Starting demo\n");
     // lv_example_btn_1();
     // lv_demo_widgets();
-    // lv_demo_stress();
+    lv_demo_stress();
     // lv_demo_music();
 
     /* measure weighted fps and opa speed */
-    lv_demo_benchmark();
+    // lv_demo_benchmark();
 
     /* This is a factory test app */
     // factory_test();

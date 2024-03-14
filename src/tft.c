@@ -161,7 +161,6 @@ static int tft_clear(struct tft_priv *priv, u16 clear)
 {
     u32 width = priv->display->xres;
     u32 height = priv->display->yres;
-    u8 data;
     int x, y;
 
     pr_debug("clearing screen (%d x %d) with color 0x%x\n", width, height, clear);
@@ -240,7 +239,10 @@ static int tft_hw_init(struct tft_priv *priv)
 
     pr_debug("clearing screen...\n");
     /* clear screen to black */
-    priv->tftops->clear(priv, 0x0);
+    priv->tftops->clear(priv, 0xf800);
+
+    pr_debug("enbaling backlight...\n");
+    dm_gpio_set_value(priv->gpio.bl, 1);
 
     return 0;
 }
