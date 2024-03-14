@@ -24,12 +24,10 @@
 
 #if LCD_DRV_USE_ILI9488
 
-struct tft_display g_display_ili9488;
-
-static int tft_init_display(struct tft_priv *priv)
+static int tft_ili9488_init_display(struct tft_priv *priv)
 {
     pr_debug("%s, writing initial sequence...\n", __func__);
-    tft_reset(priv);
+    priv->tftops->reset(priv);
     dm_gpio_set_value(priv->gpio.rd, 1);
     mdelay(150);
 
@@ -68,79 +66,20 @@ static int tft_init_display(struct tft_priv *priv)
     return 0;
 }
 
-static void inline tft_set_addr_win(struct tft_priv *priv, int xs, int ys, int xe,
-                                int ye)
-{
-    /* set column adddress */
-    write_reg(priv, 0x2A, xs >> 8, xs & 0xFF, xe >> 8, xe & 0xFF);
-    
-    /* set row address */
-    write_reg(priv, 0x2B, ys >> 8, ys & 0xFF, ye >> 8, ye & 0xFF);
-    
-    /* write start */
-    write_reg(priv, 0x2C);
-}
-
-static int tft_clear(struct tft_priv *priv, u16 clear)
-{
-    u32 width = priv->display->xres;
-    u32 height = priv->display->yres;
-    int x, y;
-
-    pr_debug("clearing screen (%d x %d) with color 0x%x\n", width, height, clear);
-
-    priv->tftops->set_addr_win(priv, 0, 0,
-                         priv->display->xres - 1,
-                         priv->display->yres - 1);
-    
-    for (x = 0; x < width; x++) {
-        for (y = 0; y < height; y++) {
-            write_buf_rs(priv, &clear, sizeof(u16), 1);
-        }
-    }
-
-    return 0;
-}
-
-static int tft_blank(struct tft_priv *priv, bool on)
-{
-    pr_debug("%s\n", __func__);
-    return 0;
-}
-
-static int tft_sleep(struct tft_priv *priv, bool on)
-{
-    pr_debug("%s\n", __func__);
-    return 0;
-}
-
-static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len)
-{
-    //pr_debug("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
-    priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
-    write_buf_rs(priv, vmem, len * 2, 1);
-}
-
-static struct tft_operations default_tft_ops = {
-    .init_display    = tft_init_display,
-    // .reset           = tft_reset,
-    .clear           = tft_clear,
-    .sleep           = tft_sleep,
-    .set_addr_win    = tft_set_addr_win,
-    .video_sync      = tft_video_sync,
-};
-
-static struct tft_display default_tft_display = {
+static struct tft_display ili9488 = {
     .xres   = TFT_X_RES,
     .yres   = TFT_Y_RES,
     .bpp    = 16,
-    .rotate = 0,
+    .backlight = 100,
+    .tftops = {
+        .write_reg = tft_write_reg16,
+        .init_display = tft_ili9488_init_display,
+    },
 };
 
 int tft_driver_init(void)
 {
-
-    tft_probe(&g_ili9488);
+    tft_probe(&ili9488);
     return 0;
 }
 

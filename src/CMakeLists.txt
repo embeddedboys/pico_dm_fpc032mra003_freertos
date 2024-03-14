@@ -36,7 +36,7 @@ if(OVERCLOCK_ENABLED)
     #  2  | 240MHz  |  120MHZ   |  1.10(V) (more stable)
     #  3  | 360MHz  |  90MHz    |  1.20(V)
     #  4  | 400MHz  |  100MHz   |  1.25(V)
-    set(OVERCLOCK_PROFILE 2)
+    set(OVERCLOCK_PROFILE 4)
 
     if(OVERCLOCK_PROFILE EQUAL 1)
         set(SYS_CLK_KHZ 266000)             # CPU clock speed
@@ -61,21 +61,22 @@ endif()
 
 # LCD Pins for 8080 interface
 set(LCD_PIN_DB_BASE  0)  # 8080 LCD data bus base pin
-set(LCD_PIN_DB_COUNT 8) # 8080 LCD data bus pin count
+set(LCD_PIN_DB_COUNT 16) # 8080 LCD data bus pin count
 set(LCD_PIN_CS  18)  # 8080 LCD chip select pin
 set(LCD_PIN_WR  19)  # 8080 LCD write pin
 set(LCD_PIN_RS  20)  # 8080 LCD register select pin
 set(LCD_PIN_RD  21)  # 8080 LCD read pin
 set(LCD_PIN_RST 22)  # 8080 LCD reset pin
 set(LCD_PIN_BL  28)  # 8080 LCD backlight pin
-set(LCD_HOR_RES 240)
-set(LCD_VER_RES 240)
+set(LCD_HOR_RES 480)
+set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
+set(I80_BUS_WR_CLK_KHZ 22500)
 
 # LCD driver type
-set(LCD_DRV_USE_ST7789  1)
-set(LCD_DRV_USE_ILI9488 0)
+set(LCD_DRV_USE_ST7789  0)
+set(LCD_DRV_USE_ILI9488 1)
 
 SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--print-memory-usage")
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--print-memory-usage")
@@ -94,8 +95,6 @@ target_compile_definitions(pio_i80 PUBLIC LCD_PIN_RS=${LCD_PIN_RS})
 target_compile_definitions(pio_i80 PUBLIC LCD_PIN_CS=${LCD_PIN_CS})
 target_compile_definitions(pio_i80 PUBLIC DEFAULT_PIO_CLK_KHZ=${PERI_CLK_KHZ})
 target_compile_definitions(pio_i80 PUBLIC PIO_USE_DMA=${PIO_USE_DMA})
-
-set(I80_BUS_WR_CLK_KHZ 10000)
 target_compile_definitions(pio_i80 PUBLIC I80_BUS_WR_CLK_KHZ=${I80_BUS_WR_CLK_KHZ})
 
 # include factory test library here
@@ -106,6 +105,7 @@ file(GLOB_RECURSE COMMON_SOURCES
     main.c
     tft.c
     tft_st7789.c
+    tft_ili9488.c
     ft6236.c
     porting/lv_port_disp_template.c
     porting/lv_port_indev_template.c

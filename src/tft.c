@@ -179,6 +179,13 @@ static int tft_clear(struct tft_priv *priv, u16 clear)
     return 0;
 }
 
+static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len)
+{
+    //pr_debug("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
+    priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
+    write_buf_rs(priv, vmem, len * 2, 1);
+}
+
 /* ----------------------- Default TFT operations -------------------------- */
 
 static int tft_gpio_init(struct tft_priv *priv)
@@ -335,6 +342,7 @@ int tft_probe(struct tft_display *display)
     priv->tftops->reset = tft_reset;
     priv->tftops->set_addr_win = tft_set_addr_win;
     priv->tftops->clear = tft_clear;
+    priv->tftops->video_sync = tft_video_sync;
 
     tft_merge_tftops(priv->tftops, &display->tftops);
 

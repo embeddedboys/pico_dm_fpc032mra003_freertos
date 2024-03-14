@@ -71,13 +71,6 @@ static int tft_st7789_init_display(struct tft_priv *priv)
     return 0;
 }
 
-static void tft_st7789_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len)
-{
-    printf("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
-    priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
-    write_buf_rs(priv, vmem, len * 2, 1);
-}
-
 static struct tft_display st7789 = {
     .xres = TFT_X_RES,
     .yres = TFT_Y_RES,
@@ -86,7 +79,6 @@ static struct tft_display st7789 = {
     .tftops = {
         .write_reg    = tft_write_reg8,
         .init_display = tft_st7789_init_display,
-        .video_sync   = tft_st7789_video_sync,
     },
 };
 
