@@ -34,16 +34,16 @@
 #include "hardware/gpio.h"
 
 #include "tft.h"
-
 #include "debug.h"
-
-/*
- * tft Command Table
- */
 
 #define DRV_NAME "tft"
 
 static struct tft_priv g_priv;
+
+static TaskHandle_t xTaskToNotify = NULL;
+static const UBaseType_t XArrayIndex = 1;
+
+/* ----------------------- Default TFT operations -------------------------- */
 
 static void fbtft_write_gpio16_wr(struct tft_priv *priv, void *buf, size_t len)
 {
@@ -108,7 +108,7 @@ void func(struct tft_priv *priv, int len, ...)  \
     \
     va_start(args, len);    \
     *buf = (reg_type)va_arg(args, unsigned int); \
-    pr_debug("cmd: 0x%x\n", *buf); \
+    pr_debug_nt("cmd : 0x%02x\n", *buf); \
     write_buf_rs(priv, buf, sizeof(reg_type), 0); \
     len--;  \
     \
@@ -116,12 +116,12 @@ void func(struct tft_priv *priv, int len, ...)  \
     if (len == 0)  \
         goto exit_no_param; \
     \
-    pr_debug("  val:"); \
+    pr_debug_nt(" val :"); \
     for (i = 0; i < len; i++) { \
-        pr_debug(" 0x%x", *buf); \
+        pr_debug_nt(" 0x%02x", *buf); \
         *buf++ = (reg_type)va_arg(args, unsigned int); \
     }   \
-    pr_debug("\n"); \
+    pr_debug_nt("\n"); \
     \
     len *= sizeof(reg_type);    \
     write_buf_rs(priv, priv->buf, len, 1);  \
@@ -132,35 +132,6 @@ exit_no_param:  \
 define_tft_write_reg(tft_write_reg8, uint8_t)
 define_tft_write_reg(tft_write_reg16, uint16_t)
 
-// void tft_write_reg(struct tft_priv *priv, int len, ...)
-// {
-//     u16 *buf = (u16 *)priv->buf;
-//     va_list args;
-//     int i;
-    
-//     va_start(args, len);
-//     *buf = (u16)va_arg(args, unsigned int);
-//     pr_debug("cmd: 0x%x\n", *buf);
-//     write_buf_rs(priv, buf, sizeof(u16), 0);
-//     len--;
-    
-//     /* if there no privams */
-//     if (len == 0)
-//         goto exit_no_param;
-    
-//     pr_debug("  val:");
-//     for (i = 0; i < len; i++) {
-//         pr_debug(" 0x%x", *buf);
-//         *buf++ = (u16)va_arg(args, unsigned int);
-//     }
-//     pr_debug("\n");
-    
-//     len *= sizeof(u16);
-//     write_buf_rs(priv, priv->buf, len, 1);
-// exit_no_param:
-//     va_end(args);
-// }
-
 static int tft_reset(struct tft_priv *priv)
 {
     pr_debug("%s\n", __func__);
@@ -170,54 +141,6 @@ static int tft_reset(struct tft_priv *priv)
     mdelay(10);
     dm_gpio_set_value(priv->gpio.reset, 1);
     mdelay(10);
-    return 0;
-}
-
-static int tft_set_var(struct tft_priv *priv)
-{
-    pr_debug("%s\n", __func__);
-    return 0;
-}
-
-static int tft_init_display(struct tft_priv *priv)
-{
-    pr_debug("%s, writing initial sequence...\n", __func__);
-    tft_reset(priv);
-    dm_gpio_set_value(priv->gpio.rd, 1);
-    mdelay(150);
-
-    write_reg(priv, 0xf7, 0xa9, 0x51, 0x2c, 0x82);
-
-    write_reg(priv, 0xc0, 0x11, 0x09);
-
-    write_reg(priv, 0xc1, 0x41);
-
-    write_reg(priv, 0xc5, 0x00, 0x28, 0x80);
-
-    write_reg(priv, 0xb1, 0xb0, 0x11);
-
-    write_reg(priv, 0xb4, 0x02);
-
-    write_reg(priv, 0xb6, 0x02, 0x22);
-
-    write_reg(priv, 0xb7, 0xc6);
-
-    write_reg(priv, 0xbe, 0x00, 0x04);
-
-    write_reg(priv, 0xe9, 0x00);
-
-    write_reg(priv, 0x36, 0x8 | (1 << 5) | (1 << 6));
-
-    write_reg(priv, 0x3a, 0x55);
-
-    write_reg(priv, 0xe0, 0x00, 0x07, 0x10, 0x09, 0x17, 0x0b, 0x41, 0x89, 0x4b, 0x0a, 0x0c, 0x0e, 0x18, 0x1b, 0x0f);
-
-    write_reg(priv, 0xe1, 0x00, 0x17, 0x1a, 0x04, 0x0e, 0x06, 0x2f, 0x45, 0x43, 0x02, 0x0a, 0x09, 0x32, 0x36, 0x0f);
-
-    write_reg(priv, 0x11);
-    mdelay(60);
-    write_reg(priv, 0x29);
-
     return 0;
 }
 
@@ -238,6 +161,7 @@ static int tft_clear(struct tft_priv *priv, u16 clear)
 {
     u32 width = priv->display->xres;
     u32 height = priv->display->yres;
+    u8 data;
     int x, y;
 
     pr_debug("clearing screen (%d x %d) with color 0x%x\n", width, height, clear);
@@ -255,35 +179,7 @@ static int tft_clear(struct tft_priv *priv, u16 clear)
     return 0;
 }
 
-static int tft_blank(struct tft_priv *priv, bool on)
-{
-    pr_debug("%s\n", __func__);
-    return 0;
-}
-
-static int tft_sleep(struct tft_priv *priv, bool on)
-{
-    pr_debug("%s\n", __func__);
-    return 0;
-}
-
-static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len)
-{
-    //pr_debug("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
-    priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
-    write_buf_rs(priv, vmem, len * 2, 1);
-}
-
-static struct tft_operations default_tft_ops = {
-    .init_display    = tft_init_display,
-    .reset           = tft_reset,
-    .clear           = tft_clear,
-    .blank           = tft_blank,
-    .sleep           = tft_sleep,
-    .set_var         = tft_set_var,
-    .set_addr_win    = tft_set_addr_win,
-    .video_sync      = tft_video_sync,
-};
+/* ----------------------- Default TFT operations -------------------------- */
 
 static int tft_gpio_init(struct tft_priv *priv)
 {
@@ -291,13 +187,13 @@ static int tft_gpio_init(struct tft_priv *priv)
 
 #if DISP_OVER_PIO
     gpio_init(priv->gpio.reset);
-    // gpio_init(priv->gpio.bl);
+    gpio_init(priv->gpio.bl);
     gpio_init(priv->gpio.cs);
     gpio_init(priv->gpio.rs);
     gpio_init(priv->gpio.rd);
 
     gpio_set_dir(priv->gpio.reset, GPIO_OUT);
-    // gpio_set_dir(priv->gpio.bl, GPIO_OUT);
+    gpio_set_dir(priv->gpio.bl, GPIO_OUT);
     gpio_set_dir(priv->gpio.cs, GPIO_OUT);
     gpio_set_dir(priv->gpio.rs, GPIO_OUT);
     gpio_set_dir(priv->gpio.rd, GPIO_OUT);
@@ -319,32 +215,28 @@ static int tft_hw_init(struct tft_priv *priv)
 {
     int ret;
 
-    printf("initializing hardware...\n");
+    pr_debug("%s\n", __func__);
 
 #if DISP_OVER_PIO
     i80_pio_init(priv->gpio.db[0], ARRAY_SIZE(priv->gpio.db), priv->gpio.wr);
 #endif
+
     tft_gpio_init(priv);
 
+    if (!priv->tftops->init_display) {
+        pr_error("init_display must be provided\n");
+        return -1;
+    }
+    
+    pr_debug("initializing display...\n");
     priv->tftops->init_display(priv);
 
-    printf("clearing screen...\n");
+    pr_debug("clearing screen...\n");
     /* clear screen to black */
-    priv->tftops->clear(priv, 0);
+    priv->tftops->clear(priv, 0x0);
 
     return 0;
 }
-
-static struct tft_display default_tft_display = {
-    .xres   = TFT_X_RES,
-    .yres   = TFT_Y_RES,
-    .bpp    = 16,
-    .rotate = 0,
-};
-
-static TaskHandle_t xTaskToNotify = NULL;
-
-const UBaseType_t XArrayIndex = 1;
 
 void tft_video_flush(int xs, int ys, int xe, int ye, void *vmem, uint32_t len)
 {
@@ -389,37 +281,68 @@ void tft_async_video_flush(struct video_frame *vf)
     xQueueSend(xToFlushQueue, (void *)vf, portMAX_DELAY);
 }
 
-#define BUF_SIZE 64
-static int tft_probe(struct tft_priv *priv)
+/* -------------------------------------------------------------------------- */
+
+void tft_merge_tftops(struct tft_ops *dst, struct tft_ops *src)
 {
-    pr_debug("tft probing ...\n");
-    
-    priv->buf = (u8 *)malloc(BUF_SIZE);
-    
-    priv->display = &default_tft_display;
-    priv->tftops = &default_tft_ops;
+    pr_debug("%s\n", __func__);
+    if (src->write_reg)
+        dst->write_reg = src->write_reg;
+    if (src->init_display)
+        dst->init_display = src->init_display;
+    if (src->reset)
+        dst->reset = src->reset;
+    if (src->clear)
+        dst->clear = src->clear;
+    if (src->sleep)
+        dst->sleep = src->sleep;
+    if (src->set_addr_win)
+        dst->set_addr_win = src->set_addr_win;
+    if (src->video_sync)
+        dst->video_sync = src->video_sync;
+}
+
+int tft_probe(struct tft_display *display)
+{
+    struct tft_priv *priv = &g_priv;
+    pr_debug("%s\n", __func__);
+
+    priv->buf = (u8 *)malloc(TFT_REG_BUF_SIZE);
+    if (!priv->buf) {
+        pr_debug("failed to allocate buffer\n");
+        return -1;
+    }
+
+    priv->tftops = (struct tft_ops *)malloc(sizeof(struct tft_ops));
+    if (!priv->tftops) {
+        pr_debug("failed to allocate tftops\n");
+        return -1;
+    }
+
+    priv->display = display;
 
     priv->gpio.bl    = LCD_PIN_BL;
     priv->gpio.reset = LCD_PIN_RST;
-    priv->gpio.rd    = 21;
+    priv->gpio.rd    = LCD_PIN_RD;
     priv->gpio.rs    = LCD_PIN_RS;
     priv->gpio.wr    = LCD_PIN_WR;
     priv->gpio.cs    = LCD_PIN_CS;
 
-    /* pin0 - pin15 for I8080 data bus */
+    /* 8080 data bus */
     for (int i = LCD_PIN_DB_BASE; i < ARRAY_SIZE(priv->gpio.db); i++)
         priv->gpio.db[i] = i;
 
-    tft_apply_patch(priv);
+    priv->tftops->reset = tft_reset;
+    priv->tftops->set_addr_win = tft_set_addr_win;
+    priv->tftops->clear = tft_clear;
+
+    tft_merge_tftops(priv->tftops, &display->tftops);
 
     tft_hw_init(priv);
 
     return 0;
-}
 
-int tft_driver_init(void)
-{
-    tft_probe(&g_priv);
-
-    return 0;
+exit_free_priv_buf:
+    free(priv->buf);
+    return -1;
 }

@@ -64,51 +64,6 @@ static void __time_critical_func(i80_set_rs)(bool rs)
     gpio_put(LCD_PIN_RS, rs);
 }
 
-// #if PIO_USE_DMA
-// static inline void __time_critical_func(i80_write_pio16_wr)(PIO pio, uint sm, void *buf, size_t len)
-// {
-//     dma_channel_configure(g_i80.dma_tx, &g_i80.dma_chnn_cfg,
-//                           &pio->txf[sm], /* write address */
-//                           (uint16_t *)buf, /* read address */
-//                           len / 2, /* element count (each element is of size transfer_data_size) */
-//                           true /* start right now */
-//     );
-
-//     dma_channel_wait_for_finish_blocking(g_i80.dma_tx);
-// }
-// #else
-// static inline void i80_write_pio16_wr(PIO pio, uint sm, void *buf, size_t len)
-// {
-//     uint16_t data;
-
-//     i80_wait_idle(pio, sm);
-//     while (len) {
-//         data = *(uint16_t *)buf;
-
-//         i80_put(pio, sm, data);
-
-//         buf += 2;
-//         len -= 2;
-//     }
-//     i80_wait_idle(pio, sm);
-// }
-// static inline void i80_write_pio8_wr(PIO pio, uint sm, void *buf, size_t len)
-// {
-//     uint8_t data;
-
-//     i80_wait_idle(pio, sm);
-//     while (len) {
-//         data = *(uint8_t *)buf;
-
-//         i80_put(pio, sm, data);
-
-//         buf += 1;
-//         len -= 1;
-//     }
-//     i80_wait_idle(pio, sm);
-// }
-// #endif
-
 #if PIO_USE_DMA
 #define define_i80_write_piox(func, buffer_type) \
 void func(PIO pio, uint sm, void *buf, size_t len) \

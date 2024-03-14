@@ -37,24 +37,27 @@ typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 
+struct tft_ops {
+    void (*write_reg)(struct tft_priv *priv, int len, ...);
+    void (*write_vmem)(struct tft_priv *priv, void *vmem, size_t len);
+
+    int (*init_display)(struct tft_priv *priv);
+    int (*reset)(struct tft_priv *priv);
+    int (*clear)(struct tft_priv *priv, u16 clear);
+    int (*sleep)(struct tft_priv *priv, bool on);
+    int (*set_backlight)(struct tft_priv *priv, uint level);
+    void (*set_addr_win)(struct tft_priv *priv, int xs, int ys, int xe, int ye);
+    void (*video_sync)(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len);
+};
+
 struct tft_display {
     u32                     xres;
     u32                     yres;
     u32                     bpp;
     u32                     rotate;
-};
+    u32                     backlight;
 
-struct tft_operations {
-    int (*init_display)(struct tft_priv *priv);
-    int (*reset)(struct tft_priv *priv);
-    int (*clear)(struct tft_priv *priv, u16 clear);
-    int (*blank)(struct tft_priv *priv, bool on);
-    int (*sleep)(struct tft_priv *priv, bool on);
-    int (*set_var)(struct tft_priv *priv);
-    void (*set_addr_win)(struct tft_priv *priv, int xs, int ys, int xe, int ye);
-    int (*set_cursor)(struct tft_priv *priv, int x, int y);
-
-    void (*video_sync)(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len);
+    struct tft_ops          tftops;
 };
 
 struct tft_priv {
@@ -71,8 +74,8 @@ struct tft_priv {
     } gpio;
     
     /* device specific */
-    struct tft_operations        *tftops;
-    struct tft_display           *display;
+    struct tft_display    *display;
+    struct tft_ops        *tftops;
 } __attribute__((__aligned__(4)));
 
 struct video_frame {
@@ -84,12 +87,15 @@ struct video_frame {
     size_t len;
 };
 
+#define TFT_REG_BUF_SIZE 64
 #define TFT_X_RES LCD_HOR_RES
 #define TFT_Y_RES LCD_VER_RES
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
-
 #define dm_gpio_set_value(p,v) gpio_put(p, v)
 #define mdelay(v) busy_wait_ms(v)
+
+extern int tft_probe(struct tft_display *display);
+extern int tft_driver_init();
 
 extern int i80_pio_init(uint8_t db_base, uint8_t db_count, uint8_t pin_wr);
 extern int i80_write_buf_rs(void *buf, size_t len, bool rs);
@@ -103,25 +109,25 @@ extern void fbtft_write_gpio16_wr_rs(struct tft_priv *priv, void *buf, size_t le
     #define write_buf_rs(p, b, l, r) fbtft_write_gpio16_wr_rs(p, b, l, r)
 #endif
 
-extern int tft_driver_init();
-extern void tft_video_flush(int xs, int ys, int xe, int ye, void *vmem16, uint32_t len);
+extern void tft_video_flush(int xs, int ys, int xe, int ye, void *vmem, uint32_t len);
 extern void tft_async_video_flush(struct video_frame *vf);
 
-extern  void tft_apply_patch(struct tft_priv *priv);
 extern void tft_write_reg(struct tft_priv *priv, int len, ...);
 #define NUMARGS(...)  (sizeof((int[]){__VA_ARGS__}) / sizeof(int))
-
 
 extern void tft_write_reg8(struct tft_priv *priv, int len, ...);
 extern void tft_write_reg16(struct tft_priv *priv, int len, ...);
 
-#if LCD_PIN_DB_COUNT == 8
+// #if LCD_PIN_DB_COUNT == 8
+// #define write_reg(priv, ...) \
+//     tft_write_reg8(priv, NUMARGS(__VA_ARGS__), __VA_ARGS__)
+// #elif LCD_PIN_DB_COUNT == 16
+// #define write_reg(priv, ...) \
+//     tft_write_reg16(priv, NUMARGS(__VA_ARGS__), __VA_ARGS__)
+// #endif
+
 #define write_reg(priv, ...) \
-    tft_write_reg8(priv, NUMARGS(__VA_ARGS__), __VA_ARGS__)
-#elif LCD_PIN_DB_COUNT == 16
-#define write_reg(priv, ...) \
-    tft_write_reg16(priv, NUMARGS(__VA_ARGS__), __VA_ARGS__)
-#endif
+    priv->tftops->write_reg(priv, NUMARGS(__VA_ARGS__), __VA_ARGS__)
 
 extern QueueHandle_t xToFlushQueue;
 extern void call_lv_disp_flush_ready(void);

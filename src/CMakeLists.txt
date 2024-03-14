@@ -65,12 +65,17 @@ set(LCD_PIN_DB_COUNT 8) # 8080 LCD data bus pin count
 set(LCD_PIN_CS  18)  # 8080 LCD chip select pin
 set(LCD_PIN_WR  19)  # 8080 LCD write pin
 set(LCD_PIN_RS  20)  # 8080 LCD register select pin
+set(LCD_PIN_RD  21)  # 8080 LCD read pin
 set(LCD_PIN_RST 22)  # 8080 LCD reset pin
 set(LCD_PIN_BL  28)  # 8080 LCD backlight pin
 set(LCD_HOR_RES 240)
 set(LCD_VER_RES 240)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
+
+# LCD driver type
+set(LCD_DRV_USE_ST7789  1)
+set(LCD_DRV_USE_ILI9488 0)
 
 SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--print-memory-usage")
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--print-memory-usage")
@@ -100,7 +105,7 @@ add_subdirectory(factory)
 file(GLOB_RECURSE COMMON_SOURCES
     main.c
     tft.c
-    tft_patch.c
+    tft_st7789.c
     ft6236.c
     porting/lv_port_disp_template.c
     porting/lv_port_indev_template.c
@@ -134,11 +139,16 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_DB_COUNT=${LCD_PIN_DB_
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_CS=${LCD_PIN_CS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_WR=${LCD_PIN_WR})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RS=${LCD_PIN_RS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RD=${LCD_PIN_RD})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RST=${LCD_PIN_RST})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_BL=${LCD_PIN_BL})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_HOR_RES=${LCD_HOR_RES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_VER_RES=${LCD_VER_RES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC DISP_OVER_PIO=${DISP_OVER_PIO})
+
+# drivers
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST7789=${LCD_DRV_USE_ST7789})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ILI9488=${LCD_DRV_USE_ILI9488})
 
 # Note: If you are using a NOR flash like "w25q16". Just keep the following content.
 # The maximum speed of "w25q16" is 133MHz, However, the clock speed of XIP QSPI is divided from "sys_clk".

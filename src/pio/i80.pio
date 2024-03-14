@@ -27,14 +27,6 @@
     nop             side 1
 .wrap
 
-.program i80_fast_8
-.side_set 1
-
-.wrap_target
-    out pins, 8     side 0
-    nop             side 1
-.wrap
-
 % c-sdk {
 
 static inline void i80_program_init(PIO pio, uint sm, uint offset, uint db_base, uint db_count, uint clk_pin, float clk_div) {
