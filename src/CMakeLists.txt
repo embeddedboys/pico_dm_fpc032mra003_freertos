@@ -26,7 +26,7 @@
 # Set all global variables here
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(OVERCLOCK_ENABLED 0)    # 1: enable, 0: disable
+set(OVERCLOCK_ENABLED 1)    # 1: enable, 0: disable
 
 if(OVERCLOCK_ENABLED)
     message(WARNING "Overclocking is enabled. This may damage your device. Use at own risk.")
@@ -72,7 +72,7 @@ set(LCD_HOR_RES 320)
 set(LCD_VER_RES 480)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
-set(I80_BUS_WR_CLK_KHZ 10000)
+set(I80_BUS_WR_CLK_KHZ 25000)
 
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)

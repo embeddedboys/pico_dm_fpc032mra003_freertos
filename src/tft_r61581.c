@@ -125,20 +125,18 @@ static int tft_r61581_init_display(struct tft_priv *priv)
 
 static int tft_clear(struct tft_priv *priv, u16 clear)
 {
-    u32 width = priv->display->xres;
+    u32 width =  priv->display->xres;
     u32 height = priv->display->yres;
-    int x, y;
 
     clear = (clear << 8) | (clear >> 8);
 
-    pr_debug("clearing screen (%d x %d) with color 0x%x\n", width, height, clear);
+    pr_debug("clearing screen (%d x %d) with color 0x%x\n",
+        width, height, clear);
 
-    priv->tftops->set_addr_win(priv, 0, 0,
-                         priv->display->xres - 1,
-                         priv->display->yres - 1);
+    priv->tftops->set_addr_win(priv, 0, 0, width, height);
     
-    for (x = 0; x < width; x++) {
-        for (y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
             write_buf_rs(priv, &clear, sizeof(u16), 1);
         }
     }
@@ -151,11 +149,15 @@ static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye
     //pr_debug("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
     priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
 
-    // rgb565_swap(vmem, len);
-    uint16_t *p = (uint16_t *)vmem;
-    for (size_t i = 0; i < len; i++) {
+    /* 
+     * r61851 color order is always BGR and not supported for changing.
+     * So simply reverse bit order here for the whole buffer.
+     * This really Influence the performance, but it's the only way to do it for now.
+     * May be we should check pico-sdk for a better way to do it.
+     */
+    u16 *p = (u16 *)vmem;
+    for (size_t i = 0; i < len; i++)
         p[i] = (p[i] << 8) | (p[i] >> 8);
-    }
 
     write_buf_rs(priv, vmem, len * 2, 1);
 }

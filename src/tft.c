@@ -239,7 +239,7 @@ static int tft_hw_init(struct tft_priv *priv)
 
     pr_debug("clearing screen...\n");
     /* clear screen to black */
-    priv->tftops->clear(priv, 0xf800);
+    priv->tftops->clear(priv, 0x0);
 
     pr_debug("enbaling backlight...\n");
     dm_gpio_set_value(priv->gpio.bl, 1);
