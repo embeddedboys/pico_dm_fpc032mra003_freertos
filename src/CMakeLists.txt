@@ -36,7 +36,7 @@ if(OVERCLOCK_ENABLED)
     #  2  | 240MHz  |  120MHZ   |  1.10(V) (more stable)
     #  3  | 360MHz  |  90MHz    |  1.20(V)
     #  4  | 400MHz  |  100MHz   |  1.25(V)
-    set(OVERCLOCK_PROFILE 4)
+    set(OVERCLOCK_PROFILE 1)
 
     if(OVERCLOCK_PROFILE EQUAL 1)
         set(SYS_CLK_KHZ 266000)             # CPU clock speed
@@ -76,8 +76,12 @@ set(I80_BUS_WR_CLK_KHZ 25000)
 
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)
-set(LCD_DRV_USE_ILI9488 0)
+set(LCD_DRV_USE_ILI9488 0)  
 set(LCD_DRV_USE_R61581  1)
+
+# Input device driver type
+set(INDEV_DRV_USE_FT6236 0)
+set(INDEV_DRV_USE_NS2009 1)
 
 SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--print-memory-usage")
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--print-memory-usage")
@@ -108,6 +112,8 @@ file(GLOB_RECURSE COMMON_SOURCES
     tft_st7789.c
     tft_ili9488.c
     tft_r61581.c
+    indev.c
+    ns2009.c
     ft6236.c
     porting/lv_port_disp_template.c
     porting/lv_port_indev_template.c
@@ -152,6 +158,10 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC DISP_OVER_PIO=${DISP_OVER_PIO}
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST7789=${LCD_DRV_USE_ST7789})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ILI9488=${LCD_DRV_USE_ILI9488})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_R61581=${LCD_DRV_USE_R61581})
+
+# Input drivers
+target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_FT6236=${INDEV_DRV_USE_FT6236})
+target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_NS2009=${INDEV_DRV_USE_NS2009})
 
 # Note: If you are using a NOR flash like "w25q16". Just keep the following content.
 # The maximum speed of "w25q16" is 133MHz, However, the clock speed of XIP QSPI is divided from "sys_clk".

@@ -13,9 +13,7 @@
 #include "lvgl/lvgl.h"
 
 #include <stdio.h>
-#include "ft6236.h"
-
-#include "porting/lv_port_disp_template.h"
+#include "indev.h"
 
 /*********************
  *      DEFINES
@@ -187,7 +185,7 @@ void lv_port_indev_init(void)
 static void touchpad_init(void)
 {
     /*Your code comes here*/
-    ft6236_driver_init();
+    indev_driver_init();
 }
 
 /*Will be called by the library to read the touchpad*/
@@ -215,16 +213,15 @@ static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 static bool touchpad_is_pressed(void)
 {
     /*Your code comes here*/
-    return ft6236_is_pressed();
-    // return false;
+    return indev_is_pressed();
 }
 
 /*Get the x and y coordinates if the touchpad is pressed*/
 static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
 {
     /*Your code comes here*/
-    (*x) = ft6236_read_x();
-    (*y) = ft6236_read_y(); 
+    (*x) = indev_read_x();
+    (*y) = indev_read_y(); 
 }
 
 /*------------------

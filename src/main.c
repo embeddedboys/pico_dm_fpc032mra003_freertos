@@ -95,8 +95,8 @@ int main(void)
 
     xToFlushQueue = xQueueCreate(2, sizeof(struct video_frame));
     
-extern int tft_driver_init(void);
 
+    // extern int tft_driver_init(void);
     // tft_driver_init();
     // for(;;);
 
@@ -106,12 +106,12 @@ extern int tft_driver_init(void);
 
     printf("Starting demo\n");
     // lv_example_btn_1();
-    // lv_demo_widgets();
+    lv_demo_widgets();
     // lv_demo_stress();
     // lv_demo_music();
 
     /* measure weighted fps and opa speed */
-    lv_demo_benchmark();
+    // lv_demo_benchmark();
 
     /* This is a factory test app */
     // factory_test();

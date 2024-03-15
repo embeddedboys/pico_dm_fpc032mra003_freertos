@@ -100,6 +100,7 @@ define_i80_write_piox(i80_write_pio16, uint16_t)
 
 int __time_critical_func(i80_write_buf_rs)(void *buf, size_t len, bool rs)
 {
+    i80_wait_idle(g_i80.pio, g_i80.sm);
     i80_set_rs_cs(rs, 0);
 
     switch (g_i80.db_count) {

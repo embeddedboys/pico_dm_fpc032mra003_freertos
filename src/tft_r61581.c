@@ -146,7 +146,7 @@ static int tft_clear(struct tft_priv *priv, u16 clear)
 
 static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len)
 {
-    //pr_debug("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
+    // printf("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
     priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
 
     /* 

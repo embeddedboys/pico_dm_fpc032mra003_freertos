@@ -25,6 +25,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+#include "hardware/i2c.h"
+
 #define FT6236_PIN_SCL  27
 #define FT6236_PIN_SDA  26
 #define FT6236_PIN_RST  18
@@ -51,18 +55,5 @@
 #define FT_REG_FOCALTECH_ID     0xA8
 #define FT_REG_RELEASE_CODE_ID  0xAF
 #define FT_REG_STATE            0xBC
-
-typedef enum {
-    FT6236_DIR_NOP       = 0x00,
-    FT6236_DIR_REVERT_X  = 0x01,
-    FT6236_DIR_REVERT_Y  = 0x02,
-    FT6236_DIR_SWITCH_XY = 0x04,
-} ft6236_direction_t;
-
-extern int ft6236_driver_init(void);
-extern bool ft6236_is_pressed(void);
-extern void ft6236_set_dir(ft6236_direction_t dir);
-extern uint16_t ft6236_read_x(void);
-extern uint16_t ft6236_read_y(void);
 
 #endif

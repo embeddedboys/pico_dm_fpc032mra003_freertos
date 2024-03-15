@@ -28,8 +28,8 @@ static int tft_ili9488_init_display(struct tft_priv *priv)
 {
     pr_debug("%s, writing initial sequence...\n", __func__);
     priv->tftops->reset(priv);
-    dm_gpio_set_value(priv->gpio.rd, 1);
-    mdelay(150);
+    // dm_gpio_set_value(priv->gpio.rd, 1);
+    // mdelay(120);
 
     write_reg(priv, 0xf7, 0xa9, 0x51, 0x2c, 0x82);
 
