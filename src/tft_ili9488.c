@@ -66,13 +66,38 @@ static int tft_ili9488_init_display(struct tft_priv *priv)
     return 0;
 }
 
+#if LCD_PIN_DB_COUNT == 8
+static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye, void *vmem, size_t len)
+{
+    // printf("video sync: xs=%d, ys=%d, xe=%d, ye=%d, len=%d\n", xs, ys, xe, ye, len);
+    priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
+
+    /* 
+     * r61851 color order is always BGR and not supported for changing.
+     * So simply reverse bit order here for the whole buffer.
+     * This really Influence the performance, but it's the only way to do it for now.
+     * May be we should check pico-sdk for a better way to do it.
+     */
+    u16 *p = (u16 *)vmem;
+    for (size_t i = 0; i < len; i++)
+        p[i] = (p[i] << 8) | (p[i] >> 8);
+
+    write_buf_rs(priv, vmem, len * 2, 1);
+}
+#endif
+
 static struct tft_display ili9488 = {
     .xres   = TFT_X_RES,
     .yres   = TFT_Y_RES,
     .bpp    = 16,
     .backlight = 100,
     .tftops = {
-        .write_reg = tft_write_reg16,
+#if LCD_PIN_DB_COUNT == 8
+        .write_reg = tft_write_reg8,
+        .video_sync = tft_video_sync,
+#else
+        .write_reg = tft_write_reg16
+#endif
         .init_display = tft_ili9488_init_display,
     },
 };
