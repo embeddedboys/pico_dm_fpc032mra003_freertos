@@ -51,6 +51,8 @@ static int tft_ili9488_init_display(struct tft_priv *priv)
 
     write_reg(priv, 0xe9, 0x00);
 
+    // Switch Page/Column Addressing Order
+    // Invert Column Address Order
     write_reg(priv, 0x36, 0x8 | (1 << 5) | (1 << 6));
 
     write_reg(priv, 0x3a, 0x55);
@@ -73,10 +75,18 @@ static void tft_video_sync(struct tft_priv *priv, int xs, int ys, int xe, int ye
     priv->tftops->set_addr_win(priv, xs, ys, xe, ye);
 
     /* 
-     * r61851 color order is always BGR and not supported for changing.
-     * So simply reverse bit order here for the whole buffer.
-     * This really Influence the performance, but it's the only way to do it for now.
-     * May be we should check pico-sdk for a better way to do it.
+     * 8080 8-bit Data Bus for 16-bit/pixel (RGB 5-6-5 Bits Input)
+     *      DB 7     R4  G2
+     *      DB 6     R3  G1
+     *      DB 5     R2  G0
+     *      DB 4     R1  B4
+     *      DB 3     R0  B3
+     *      DB 2     G5  B2
+     *      DB 1     G4  B1
+     *      DB 0     G3  B0
+     * But a 16-bit Data Bus RGB565 order like this:
+     * B0 - B4, G0 - G5, R0 - R4 from DB0 to DB16
+     * So simply swap 2 bytes here from pixel buffer.
      */
     u16 *p = (u16 *)vmem;
     for (size_t i = 0; i < len; i++)
