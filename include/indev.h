@@ -51,8 +51,8 @@ enum {
 
 typedef enum {
     INDEV_DIR_NOP       = 0x00,
-    INDEV_DIR_REVERT_X  = 0x01,
-    INDEV_DIR_REVERT_Y  = 0x02,
+    INDEV_DIR_INVERT_X  = 0x01,
+    INDEV_DIR_INVERT_Y  = 0x02,
     INDEV_DIR_SWITCH_XY = 0x04,
 } indev_direction_t;
 
@@ -93,6 +93,8 @@ struct indev_spec {
 
     u16            x_res;
     u16            y_res;
+    int            x_offs;
+    int            y_offs;
 
     /* for res-touch like */
     u8             resolution;
@@ -104,12 +106,15 @@ struct indev_spec {
 };
 
 struct indev_priv {
-    u16                 x_res;
+    u16                 x_res;    /* physical touch resolution */
     u16                 y_res;
+    float               sc_x;     /* scaling constant for x_res */
+    float               sc_y;     /* scaling constant for y_res */
 
     indev_direction_t   dir;
-    bool                revert_x;
-    bool                revert_y;
+    bool                invert_x;
+    bool                invert_y;
+    bool                switch_xy;
 
     struct indev_spec   *spec;
     struct indev_ops    *ops;

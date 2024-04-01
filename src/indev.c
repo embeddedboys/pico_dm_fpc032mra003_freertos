@@ -35,31 +35,51 @@ bool indev_is_pressed(void)
     return __indev_is_pressed(&g_indev_priv);
 }
 
+static void swap_float(float *a, float *b)
+{
+    float temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 static void __indev_set_dir(struct indev_priv *priv, indev_direction_t dir)
 {
     priv->dir = dir;
 
-    if (dir & INDEV_DIR_REVERT_X)
-        priv->revert_x = true;
-    else
-        priv->revert_x = false;
+    if (dir & INDEV_DIR_INVERT_X) {
+        priv->invert_x = true;
+    } else {
+        priv->invert_x = false;
+    }
 
-    if (dir & INDEV_DIR_REVERT_Y)
-        priv->revert_y = true;
-    else
-        priv->revert_y = false;
+    if (dir & INDEV_DIR_INVERT_Y) {
+        priv->invert_y = true;
+    } else {
+        priv->invert_y = false;
+    }
 
     if (dir & INDEV_DIR_SWITCH_XY) {
+        priv->switch_xy = true;
+
         priv->ops->read_x = priv->spec->ops.read_y;
         priv->ops->read_y = priv->spec->ops.read_x;
 
-        bool revert_tmp = priv->revert_x;
-        priv->revert_x = priv->revert_y;
-        priv->revert_y = revert_tmp;
+        bool invert_tmp = priv->invert_x;
+        priv->invert_x = priv->invert_y;
+        priv->invert_y = invert_tmp;
 
-        priv->x_res = priv->spec->y_res;
-        priv->y_res = priv->spec->x_res;
+        u16 offs_tmp = priv->spec->x_offs;
+        priv->spec->x_offs = priv->spec->y_offs;
+        priv->spec->y_offs = offs_tmp;
+
+        swap_float(&priv->sc_x, &priv->sc_y);
+
+        u16 res_tmp = priv->x_res;
+        priv->x_res = priv->y_res;
+        priv->y_res = res_tmp;
     } else {
+        priv->switch_xy = false;
+
         priv->ops->read_x = priv->spec->ops.read_x;
         priv->ops->read_y = priv->spec->ops.read_y;
     }
@@ -139,14 +159,25 @@ int indev_probe(struct indev_spec *spec)
         return -1;
     }
 
-    priv->x_res = spec->x_res;
-    priv->y_res = spec->y_res;
+    priv->x_res = LCD_HOR_RES;
+    priv->y_res = LCD_VER_RES;
 
-    priv->revert_x = false;
-    priv->revert_y = false;
+    priv->invert_x = false;
+    priv->invert_y = false;
 
     priv->ops->reset = indev_reset;
     priv->ops->set_dir = __indev_set_dir;
+
+    float tft_x = LCD_HOR_RES;
+    float tft_y = LCD_VER_RES;
+
+    float touch_x = priv->spec->x_res;
+    float touch_y = priv->spec->y_res;
+
+    priv->sc_x = (float)(tft_x / touch_x);
+    priv->sc_y = (float)(tft_y / touch_y);
+
+    pr_debug("sc_x : %f, sc_y : %f", priv->sc_x, priv->sc_y);
 
     indev_merge_ops(priv->ops, &spec->ops);
 

@@ -92,26 +92,42 @@ static uint8_t ns2009_read_reg(struct indev_priv *priv, uint8_t reg)
 uint16_t ns2009_read_x(struct indev_priv *priv)
 {
     uint8_t val = read_reg(priv, NS2009_CMD_READ_X);
+    u16 this_x = 0;
 
-    if (priv->revert_x)
-        return (priv->x_res - (val * priv->x_res) / (1 << priv->spec->resolution));
-    
-    return (val * priv->x_res) / (1 << priv->spec->resolution);
+    if (priv->invert_x)
+        this_x = (priv->x_res - (val * priv->x_res) / (1 << priv->spec->resolution));
+    else
+        this_x = (val * priv->x_res) / (1 << priv->spec->resolution);
+
+    pr_debug("x : %d, sc_x : %f\n", this_x, priv->sc_x);
+    this_x += priv->spec->x_offs;
+    this_x *= priv->sc_x;
+    pr_debug("x : %d, sc_x : %f\n", this_x, priv->sc_x);
+
+    return this_x;
 }
 
 uint16_t ns2009_read_y(struct indev_priv *priv)
 {
     uint8_t val = read_reg(priv, NS2009_CMD_READ_Y);
+    u16 this_y = 0;
 
-    if (priv->revert_y)
-        return (priv->y_res - (val * priv->y_res) / (1 << priv->spec->resolution));
-    
-    return (val * priv->y_res) / (1 << priv->spec->resolution);
+    if (priv->invert_y)
+        this_y = (priv->y_res - (val * priv->y_res) / (1 << priv->spec->resolution));
+    else
+        this_y = (val * priv->y_res) / (1 << priv->spec->resolution);
+
+    pr_debug("y : %d, sc_y : %f\n", this_y, priv->sc_y);
+    this_y += priv->spec->y_offs;
+    this_y *= priv->sc_y;
+    pr_debug("y : %d, sc_y : %f\n", this_y, priv->sc_y);
+
+    return this_y;
 }
 
-#define REAL_X(x) ((x * priv->y_res) / (1 << priv->spec->resolution))
-#define REAL_Y(y) ((y * priv->x_res) / (1 << priv->spec->resolution))
-#define TEST(v) (v | (0x1 << 2))
+// #define REAL_X(x) ((x * priv->y_res) / (1 << priv->spec->resolution))
+// #define REAL_Y(y) ((y * priv->x_res) / (1 << priv->spec->resolution))
+// #define TEST(v) (v | (0x1 << 2))
 bool ns2009_is_pressed(struct indev_priv *priv)
 {
     // printf("X- : %d  Y- : %d\n", REAL_X(read_reg(priv, TEST(0xA0))), REAL_Y(read_reg(priv, TEST(0xB0))));
@@ -141,7 +157,7 @@ static void ns2009_hw_init(struct indev_priv *priv)
     i2c_bus_scan(priv->spec->i2c.master);
 
     priv->ops->reset(priv);
-    priv->ops->set_dir(priv, INDEV_DIR_REVERT_Y);
+    priv->ops->set_dir(priv, INDEV_DIR_SWITCH_XY | INDEV_DIR_INVERT_Y | INDEV_DIR_INVERT_X);
 }
 
 static struct indev_spec ns2009 = {
@@ -155,8 +171,10 @@ static struct indev_spec ns2009 = {
         .pin_sda = NS2009_PIN_SDA,
     },
 
-    .x_res = TOUCH_X_RES,
-    .y_res = TOUCH_Y_RES,
+    .x_res  = 410,  // 25 ~ 435 --- 0 ~ 410
+    .y_res  = 275,  // 25 ~ 300 --- 0 ~ 275
+    .x_offs = -25,
+    .y_offs = -25,
     .resolution = NS2009_RESOLUTION_8BIT,
 
     .pin_irq = NS2009_PIN_IRQ,
