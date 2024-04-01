@@ -16,7 +16,7 @@
 
 - [ ] Input driver framework
 
-- [ ] Resistive touch screen calibration support
+- [x] Resistive touch screen calibration support
 
 - [ ] NS2009 support
 
