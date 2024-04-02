@@ -81,8 +81,12 @@ set(I80_BUS_WR_CLK_KHZ 25000)
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)
 set(LCD_DRV_USE_ILI9488 0)  
-set(LCD_DRV_USE_R61581  1)
-set(LCD_DRV_USE_ST6201  0)
+set(LCD_DRV_USE_R61581  0)
+set(LCD_DRV_USE_ST6201  1)
+
+if(LCD_DRV_USE_ST6201)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/st6201.cmake)
+endif()
 
 # Input device driver type
 set(INDEV_DRV_USE_FT6236 0)
