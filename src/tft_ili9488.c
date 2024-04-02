@@ -106,7 +106,7 @@ static struct tft_display ili9488 = {
         .write_reg = tft_write_reg8,
         .video_sync = tft_video_sync,
 #else
-        .write_reg = tft_write_reg16
+        .write_reg = tft_write_reg16,
 #endif
         .init_display = tft_ili9488_init_display,
     },
