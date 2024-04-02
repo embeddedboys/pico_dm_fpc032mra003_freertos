@@ -82,6 +82,7 @@ set(I80_BUS_WR_CLK_KHZ 25000)
 set(LCD_DRV_USE_ST7789  0)
 set(LCD_DRV_USE_ILI9488 0)  
 set(LCD_DRV_USE_R61581  1)
+set(LCD_DRV_USE_ST6201  0)
 
 # Input device driver type
 set(INDEV_DRV_USE_FT6236 0)
@@ -116,6 +117,7 @@ file(GLOB_RECURSE COMMON_SOURCES
     tft_st7789.c
     tft_ili9488.c
     tft_r61581.c
+    tft_st6201.c
     indev.c
     ns2009.c
     ft6236.c
@@ -162,6 +164,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC DISP_OVER_PIO=${DISP_OVER_PIO}
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST7789=${LCD_DRV_USE_ST7789})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ILI9488=${LCD_DRV_USE_ILI9488})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_R61581=${LCD_DRV_USE_R61581})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST6201=${LCD_DRV_USE_ST6201})
 
 # Input drivers
 target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_FT6236=${INDEV_DRV_USE_FT6236})
