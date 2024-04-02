@@ -223,6 +223,8 @@ static int tft_hw_init(struct tft_priv *priv)
 
     pr_debug("%s\n", __func__);
 
+    printf("TFT interface type: %s\n", DISP_OVER_PIO ? "PIO" : "GPIO");
+
 #if DISP_OVER_PIO
     i80_pio_init(priv->gpio.db[0], ARRAY_SIZE(priv->gpio.db), priv->gpio.wr);
 #endif

@@ -154,6 +154,7 @@ int i80_pio_init(uint8_t db_base, uint8_t db_count, uint8_t pin_wr)
     g_i80.offset = pio_add_program(g_i80.pio, &i80_program);
     g_i80.clk_div = (DEFAULT_PIO_CLK_KHZ / 2.f / I80_BUS_WR_CLK_KHZ);
 
+    printf("I80_BUS_WR_CLK_KHZ : %d\n", I80_BUS_WR_CLK_KHZ);
     i80_program_init(
         g_i80.pio, g_i80.sm, g_i80.offset, 
         g_i80.db_base, g_i80.db_count, 
