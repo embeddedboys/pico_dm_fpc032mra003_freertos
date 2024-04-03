@@ -131,6 +131,16 @@ static void indev_merge_ops(struct indev_ops *dst, struct indev_ops *src)
     if (src->read_reg)
         dst->read_reg = src->read_reg;
 
+    if (src->write_reg16)
+        dst->write_reg16 = src->write_reg16;
+    if (src->read_reg16)
+        dst->read_reg16 = src->read_reg16;
+
+    if (src->write_addr16)
+        dst->write_addr16 = src->write_addr16;
+    if (src->read_addr16)
+        dst->read_addr16 = src->read_addr16;
+
     if (src->init)
         dst->init = src->init;
     if (src->reset)

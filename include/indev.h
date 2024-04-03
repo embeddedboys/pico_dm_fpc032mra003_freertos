@@ -31,6 +31,7 @@
 #define TOUCH_Y_RES LCD_VER_RES
 
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
+#define udelay(v)   busy_wait_us(v)
 #define mdelay(v)   busy_wait_ms(v)
 #define dm_gpio_set_value(p,v) gpio_put(p, v)
 
@@ -39,6 +40,12 @@
 
 #define read_reg(priv, reg) \
     priv->ops->read_reg(priv, reg)
+
+#define write_addr16(priv, reg, buf, len) \
+    priv->ops->write_addr16(priv, reg, buf, len)
+
+#define read_addr16(priv, reg, buf, len) \
+    priv->ops->read_addr16(priv, reg, buf, len)
 
 typedef unsigned int u32;
 typedef unsigned short u16;
@@ -61,6 +68,12 @@ struct indev_priv;
 struct indev_ops {
     void    (*write_reg)(struct indev_priv *priv, u8 reg, u8 val);
     u8      (*read_reg)(struct indev_priv *priv, u8 reg);
+
+    /* For 16-bit register */
+    void    (*write_reg16)(struct indev_priv *priv, u16 reg, u8 val);
+    u8      (*read_reg16)(struct indev_priv *priv, u16 reg);
+    void    (*write_addr16)(struct indev_priv *priv, u16 reg, u8 *txbuf, u8 len);
+    void    (*read_addr16)(struct indev_priv *priv, u16 reg, u8 *rxbuf, u8 len);
 
     void    (*init)(struct indev_priv *priv);
     void    (*reset)(struct indev_priv *priv);

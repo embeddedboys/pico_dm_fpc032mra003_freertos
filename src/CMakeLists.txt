@@ -90,7 +90,8 @@ endif()
 
 # Input device driver type
 set(INDEV_DRV_USE_FT6236 0)
-set(INDEV_DRV_USE_NS2009 1)
+set(INDEV_DRV_USE_NS2009 0)
+set(INDEV_DRV_USE_GT911  1)
 
 SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--print-memory-usage")
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--print-memory-usage")
@@ -125,6 +126,7 @@ file(GLOB_RECURSE COMMON_SOURCES
     indev.c
     ns2009.c
     ft6236.c
+    gt911.c
     porting/lv_port_disp_template.c
     porting/lv_port_indev_template.c
     i2c_tools.c
@@ -173,6 +175,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST6201=${LCD_DRV_U
 # Input drivers
 target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_FT6236=${INDEV_DRV_USE_FT6236})
 target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_NS2009=${INDEV_DRV_USE_NS2009})
+target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_GT911=${INDEV_DRV_USE_GT911})
 
 # Note: If you are using a NOR flash like "w25q16". Just keep the following content.
 # The maximum speed of "w25q16" is 133MHz, However, the clock speed of XIP QSPI is divided from "sys_clk".
