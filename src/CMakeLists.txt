@@ -81,9 +81,9 @@ set(I80_BUS_WR_CLK_KHZ 18000)
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)
 set(LCD_DRV_USE_ILI9488 0)
-set(LCD_DRV_USE_R61581  0)
+set(LCD_DRV_USE_R61581  1)
 set(LCD_DRV_USE_ST6201  0)
-set(LCD_DRV_USE_1P5623  1)
+set(LCD_DRV_USE_1P5623  0)
 
 if(LCD_DRV_USE_ILI9488)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/ili9488.cmake)
@@ -96,9 +96,10 @@ elseif(LCD_DRV_USE_1P5623)
 endif()
 
 # Input device driver type
-set(INDEV_DRV_USE_FT6236 1)
-set(INDEV_DRV_USE_NS2009 0)
-set(INDEV_DRV_USE_GT911  0)
+set(INDEV_DRV_USE_FT6236  0)
+set(INDEV_DRV_USE_NS2009  0)
+set(INDEV_DRV_USE_TSC2007 1)
+set(INDEV_DRV_USE_GT911   0)
 
 SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,--print-memory-usage")
 SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--print-memory-usage")
@@ -133,6 +134,7 @@ file(GLOB_RECURSE COMMON_SOURCES
     tft_1p5623.c
     indev.c
     ns2009.c
+    tsc2007.c
     ft6236.c
     gt911.c
     porting/lv_port_disp_template.c
@@ -184,6 +186,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_1P5623=${LCD_DRV_U
 # Input drivers
 target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_FT6236=${INDEV_DRV_USE_FT6236})
 target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_NS2009=${INDEV_DRV_USE_NS2009})
+target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_TSC2007=${INDEV_DRV_USE_TSC2007})
 target_compile_definitions(${PROJECT_NAME} PUBLIC INDEV_DRV_USE_GT911=${INDEV_DRV_USE_GT911})
 
 # Note: If you are using a NOR flash like "w25q16". Just keep the following content.
