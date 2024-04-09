@@ -89,7 +89,27 @@ static uint8_t ns2009_read_reg(struct indev_priv *priv, uint8_t reg)
     return val;
 }
 
-uint16_t ns2009_read_x(struct indev_priv *priv)
+void bubble_sort(uint16_t a[], int len)
+{
+        int temp;
+        len--;
+        for (int i = 0; i < len; i++)
+                for (int j = i; j < len; j++) {
+                        if(a[j] > a[j+1]) {
+                                temp = a[j];
+                                a[j] = a[j+1];
+                                a[j+1] = temp;
+                        }
+                }
+}
+
+#define SAMPLE_TIME 4
+static uint16_t filter(uint16_t a[], int len)
+{
+    return a[SAMPLE_TIME / 2 - 1];
+}
+
+uint16_t __ns2009_read_x(struct indev_priv *priv)
 {
     uint8_t val = read_reg(priv, NS2009_CMD_READ_X);
     u16 this_x = 0;
@@ -107,7 +127,17 @@ uint16_t ns2009_read_x(struct indev_priv *priv)
     return this_x;
 }
 
-uint16_t ns2009_read_y(struct indev_priv *priv)
+uint16_t ns2009_read_x(struct indev_priv *priv)
+{
+    u16 data[SAMPLE_TIME];
+    
+    for (int i = 0; i < SAMPLE_TIME; i++)
+        data[i] = __ns2009_read_x(priv);
+
+    return filter(data, ARRAY_SIZE(data));
+}
+
+uint16_t __ns2009_read_y(struct indev_priv *priv)
 {
     uint8_t val = read_reg(priv, NS2009_CMD_READ_Y);
     u16 this_y = 0;
@@ -123,6 +153,16 @@ uint16_t ns2009_read_y(struct indev_priv *priv)
     pr_debug("y : %d, sc_y : %f\n", this_y, priv->sc_y);
 
     return this_y;
+}
+
+uint16_t ns2009_read_y(struct indev_priv *priv)
+{
+    u16 data[SAMPLE_TIME];
+    
+    for (int i = 0; i < SAMPLE_TIME; i++)
+        data[i] = __ns2009_read_y(priv);
+
+    return filter(data, ARRAY_SIZE(data));
 }
 
 // #define REAL_X(x) ((x * priv->y_res) / (1 << priv->spec->resolution))
