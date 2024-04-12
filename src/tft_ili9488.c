@@ -39,7 +39,8 @@ static int tft_ili9488_init_display(struct tft_priv *priv)
 
     write_reg(priv, 0xc5, 0x00, 0x28, 0x80);
 
-    write_reg(priv, 0xb1, 0xb0, 0x11);
+    // write_reg(priv, 0xb1, 0xb0, 0x11); // 60 Hz
+    write_reg(priv, 0xb1, 0xd0, 0x13);  // 90Hz
 
     write_reg(priv, 0xb4, 0x02);
 
