@@ -77,7 +77,7 @@ set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
 set(I80_BUS_WR_CLK_KHZ 18000)
-math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 12")
+math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 4")
 
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)
