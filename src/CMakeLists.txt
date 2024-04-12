@@ -77,16 +77,20 @@ set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
 set(I80_BUS_WR_CLK_KHZ 18000)
+math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 12")
 
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)
 set(LCD_DRV_USE_ILI9488 0)
-set(LCD_DRV_USE_R61581  1)
+set(LCD_DRV_USE_ILI9806 1)
+set(LCD_DRV_USE_R61581  0)
 set(LCD_DRV_USE_ST6201  0)
 set(LCD_DRV_USE_1P5623  0)
 
 if(LCD_DRV_USE_ILI9488)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/ili9488.cmake)
+elseif(LCD_DRV_USE_ILI9806)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/ili9806.cmake)
 elseif(LCD_DRV_USE_R61581)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/r61581.cmake)
 elseif(LCD_DRV_USE_ST6201)
@@ -129,6 +133,7 @@ file(GLOB_RECURSE COMMON_SOURCES
     tft.c
     tft_st7789.c
     tft_ili9488.c
+    tft_ili9806.c
     tft_r61581.c
     tft_st6201.c
     tft_1p5623.c
@@ -175,10 +180,12 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_BL=${LCD_PIN_BL})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_HOR_RES=${LCD_HOR_RES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_VER_RES=${LCD_VER_RES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC DISP_OVER_PIO=${DISP_OVER_PIO})
+target_compile_definitions(${PROJECT_NAME} PUBLIC MY_DISP_BUF_SIZE=${MY_DISP_BUF_SIZE})
 
 # TFT drivers
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST7789=${LCD_DRV_USE_ST7789})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ILI9488=${LCD_DRV_USE_ILI9488})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ILI9806=${LCD_DRV_USE_ILI9806})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_R61581=${LCD_DRV_USE_R61581})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_ST6201=${LCD_DRV_USE_ST6201})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_DRV_USE_1P5623=${LCD_DRV_USE_1P5623})
