@@ -38,7 +38,7 @@
 #define NS2009_PIN_SCL    27
 #define NS2009_PIN_SDA    26
 #define NS2009_PIN_IRQ    21
-#define NS2009_PIN_RST    18
+#define NS2009_PIN_RST    29
 
 #define NS2009_CMD_READ_X 0xC0
 #define NS2009_CMD_READ_Y 0xD0
@@ -201,6 +201,7 @@ static void ns2009_hw_init(struct indev_priv *priv)
 }
 
 static struct indev_spec ns2009 = {
+    .name = "ns2009",
     .type = INDEV_TYPE_POINTER,
 
     .i2c = {

@@ -38,7 +38,7 @@
 #define TSC2007_PIN_SCL    27
 #define TSC2007_PIN_SDA    26
 #define TSC2007_PIN_IRQ    21
-#define TSC2007_PIN_RST    18
+#define TSC2007_PIN_RST    29
 
 #define TSC2007_CMD_READ_X 0xC0
 #define TSC2007_CMD_READ_Y 0xD0
@@ -161,6 +161,7 @@ static void tsc2007_hw_init(struct indev_priv *priv)
 }
 
 static struct indev_spec tsc2007 = {
+    .name = "tsc2007",
     .type = INDEV_TYPE_POINTER,
 
     .i2c = {

@@ -204,6 +204,7 @@ static void gt911_hw_init(struct indev_priv *priv)
 }
 
 static struct indev_spec gt911 = {
+    .name = "ft6236",
     .type = INDEV_TYPE_POINTER,
 
     .i2c = {

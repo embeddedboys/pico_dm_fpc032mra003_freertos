@@ -112,6 +112,7 @@ static void ft6236_hw_init(struct indev_priv *priv)
 }
 
 static struct indev_spec ft6236 = {
+    .name = "ft6236",
     .type = INDEV_TYPE_POINTER,
 
     .i2c = {

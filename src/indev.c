@@ -161,6 +161,13 @@ int indev_probe(struct indev_spec *spec)
 
     pr_debug("%s\n", __func__);
 
+    if (!spec->name) {
+        printf("ERROR: set indev spec a name!\n");
+        return -1;
+    }
+
+    printf("%s, %s driver probing...\n", __func__, spec->name);
+
     priv->spec = spec;
 
     priv->ops = (struct indev_ops *)malloc(sizeof(struct indev_ops));

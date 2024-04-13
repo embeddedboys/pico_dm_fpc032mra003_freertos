@@ -85,6 +85,7 @@ struct indev_ops {
 
 struct indev_spec {
     u8 type;
+    char *name;
 
     struct {
         u8     addr;
