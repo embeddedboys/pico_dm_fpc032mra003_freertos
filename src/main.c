@@ -64,7 +64,7 @@ static portTASK_FUNCTION(lv_timer_task_handler, pvParameters)
 	xLastWakeTime = xTaskGetTickCount();  
 	
 	for(;;) {		
-		// vTaskDelayUntil( &xLastWakeTime,xPeriod );
+		vTaskDelayUntil( &xLastWakeTime,xPeriod );
 		lv_timer_handler();
 	}
 	vTaskDelete(NULL);
