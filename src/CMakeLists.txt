@@ -26,7 +26,7 @@
 # Set all global variables here
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(OVERCLOCK_ENABLED 0)    # 1: enable, 0: disable
+set(OVERCLOCK_ENABLED 1)    # 1: enable, 0: disable
 
 if(OVERCLOCK_ENABLED)
     message(WARNING "Overclocking is enabled. This may damage your device. Use at own risk.")
@@ -37,7 +37,7 @@ if(OVERCLOCK_ENABLED)
     #  3  | 360MHz  |  90MHz    |  1.20(V)
     #  4  | 400MHz  |  100MHz   |  1.30(V)
     #  5  | 416MHz  |  104MHz   |  1.30(V)
-    set(OVERCLOCK_PROFILE 1)
+    set(OVERCLOCK_PROFILE 4)
 
     if(OVERCLOCK_PROFILE EQUAL 1)
         set(SYS_CLK_KHZ 266000)             # CPU clock speed
@@ -77,7 +77,7 @@ set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
 set(I80_BUS_WR_CLK_KHZ 18000)
-math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 4")
+math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 10")
 
 # LCD driver type
 set(LCD_DRV_USE_ST7789  0)
@@ -125,7 +125,7 @@ target_compile_definitions(pio_i80 PUBLIC PIO_USE_DMA=${PIO_USE_DMA})
 target_compile_definitions(pio_i80 PUBLIC I80_BUS_WR_CLK_KHZ=${I80_BUS_WR_CLK_KHZ})
 
 # include factory test library here
-add_subdirectory(factory)
+# add_subdirectory(factory)
 
 # user define common source files
 file(GLOB_RECURSE COMMON_SOURCES
@@ -163,7 +163,7 @@ target_link_libraries(${PROJECT_NAME}
     hardware_i2c
     hardware_pwm
     lvgl lvgl::demos lvgl::examples
-    factory_test
+    # factory_test
     )
 
 # add target common defines here

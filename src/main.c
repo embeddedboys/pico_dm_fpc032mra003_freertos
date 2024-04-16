@@ -64,7 +64,7 @@ static portTASK_FUNCTION(lv_timer_task_handler, pvParameters)
 	xLastWakeTime = xTaskGetTickCount();  
 	
 	for(;;) {		
-		vTaskDelayUntil( &xLastWakeTime,xPeriod );
+		// vTaskDelayUntil( &xLastWakeTime,xPeriod );
 		lv_timer_handler();
 	}
 	vTaskDelete(NULL);
@@ -104,16 +104,16 @@ int main(void)
 
     lv_init();
     lv_port_disp_init();
-    lv_port_indev_init();
+    // lv_port_indev_init();
 
     printf("Starting demo\n");
     // lv_example_btn_1();
-    lv_demo_widgets();
+    // lv_demo_widgets();
     // lv_demo_stress();
     // lv_demo_music();
 
     /* measure weighted fps and opa speed */
-    // lv_demo_benchmark();
+    lv_demo_benchmark();
 
     /* This is a factory test app */
     // factory_test();
