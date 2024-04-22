@@ -32,18 +32,18 @@ if(OVERCLOCK_ENABLED)
     message(WARNING "Overclocking is enabled. This may damage your device. Use at own risk.")
     # Overclocking profiles
     #      SYS_CLK  | FLASH_CLK | Voltage
-    #  1  | 266MHz  |  133MHz   |  1.10(V) (default, stable, recommended for most devices)
-    #  2  | 240MHz  |  120MHZ   |  1.10(V) (more stable)
+    #  1  | 240MHz  |  120MHZ   |  1.10(V) (default, stable, recommended for most devices)
+    #  2  | 266MHz  |  133MHz   |  1.10(V)
     #  3  | 360MHz  |  90MHz    |  1.20(V)
     #  4  | 400MHz  |  100MHz   |  1.30(V)
     #  5  | 416MHz  |  104MHz   |  1.30(V)
-    set(OVERCLOCK_PROFILE 4)
+    set(OVERCLOCK_PROFILE 1)
 
     if(OVERCLOCK_PROFILE EQUAL 1)
-        set(SYS_CLK_KHZ 266000)             # CPU clock speed
+        set(SYS_CLK_KHZ 240000)             # CPU clock speed
         set(PERI_CLK_KHZ ${SYS_CLK_KHZ})    # Peripheral clock speed
     elseif(OVERCLOCK_PROFILE EQUAL 2)
-        set(SYS_CLK_KHZ 240000)
+        set(SYS_CLK_KHZ 266000)
         set(PERI_CLK_KHZ ${SYS_CLK_KHZ})
     elseif(OVERCLOCK_PROFILE EQUAL 3)
         set(SYS_CLK_KHZ 360000)
