@@ -1,23 +1,17 @@
-# Pico DM 8080 Template
+> <h1 align="center">Pico DM FPC032MRA003<h1>
 
-## TODO list
+> <h1 align="center">"最具性价比的LVGL开发板之一"</h1>
 
-- [x] support LVGL v8.3
+> <h3 align="center">Pico_DM_FPC032MRA003 是基于树莓派 Pico 核心板设计的一款超低成本显示拓展板，分辨率为480x320，专用于学习、评估、开发LVGL或其他GUI应用。 </h3>
 
-- [ ] support LVGL v9
+> <h4 align="center">本产品起价29.8￥，在bilibili工房下单享受更低粉丝优惠价～</h4>
 
-- [x] Overclocking profile support
+视频链接：[bilibili.com]()
 
-- [ ] dynamic frequency modifier
+文档链接：[https://embeddedboys.github.io/Pico_DM_FPC032MRA003/](https://embeddedboys.github.io/Pico_DM_FPC032MRA003/)
 
-- [x] 8080 PIO All in one
+![image](assets/dm_fpc032mra003_0.png)
 
-- [x] TFT driver framework
+> <h3 align="center"> 支持使用 pico-sdk 或 MicroPythona 开发 </h3>
 
-- [ ] Input driver framework
-
-- [x] Resistive touch screen calibration support
-
-- [ ] NS2009 support
-
-present by embeddedboys developers
+![image](assets/dm_fpc032mra003_1.png)
