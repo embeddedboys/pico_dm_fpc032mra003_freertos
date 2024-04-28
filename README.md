@@ -15,3 +15,16 @@
 > <h3 align="center"> 支持使用 pico-sdk 或 MicroPythona 开发 </h3>
 
 ![image](assets/dm_fpc032mra003_1.png)
+
+<p align="center">
+玩得开心！</br>
+干杯,</br>
+</p>
+
+<h2 align="center">
+    <img src="assets/048-boy-next.png" width="10%" alt="embeddedboys logo" /> </br>
+    <img alt="Static Badge" src="https://img.shields.io/badge/🍺-embeddedboys-blue">
+</h2>
+<h2 align="center">
+    <a href="https://embeddedboys.github.io/">embeddedboys</a> 献上
+</h2>
