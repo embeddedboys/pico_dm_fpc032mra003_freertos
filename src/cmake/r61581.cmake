@@ -10,4 +10,4 @@ set(LCD_HOR_RES 480)
 set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
-set(I80_BUS_WR_CLK_KHZ 42000)
+set(I80_BUS_WR_CLK_KHZ 40000)
