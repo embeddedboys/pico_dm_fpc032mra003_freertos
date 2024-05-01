@@ -6,9 +6,9 @@
 
 > <h4 align="center">本产品起价29.8￥，在bilibili工房下单享受更低粉丝优惠价～</h4>
 
-视频链接：[bilibili.com]()
+视频链接：[[bilibili.com](https://www.bilibili.com/video/BV18D421T7gM)](https://www.bilibili.com/video/BV18D421T7gM)
 
-文档链接：[https://embeddedboys.github.io/Pico_DM_FPC032MRA003/](https://embeddedboys.github.io/Pico_DM_FPC032MRA003/)
+文档链接：[http://embeddedboys.com/Pico_DM_FPC032MRA003/](http://embeddedboys.com/Pico_DM_FPC032MRA003/)
 
 ![image](assets/dm_fpc032mra003_0.png)
 
