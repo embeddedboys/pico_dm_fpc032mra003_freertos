@@ -12,7 +12,7 @@
 
 ![image](assets/dm_fpc032mra003_0.png)
 
-> <h3 align="center"> 支持使用 pico-sdk 或 MicroPythona 开发 </h3>
+> <h3 align="center"> 支持使用 pico-sdk 或 MicroPython 开发 </h3>
 
 ![image](assets/dm_fpc032mra003_1.png)
 

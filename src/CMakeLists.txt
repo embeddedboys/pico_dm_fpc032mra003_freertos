@@ -26,7 +26,7 @@
 # Set all global variables here
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(OVERCLOCK_ENABLED 1)    # 1: enable, 0: disable
+set(OVERCLOCK_ENABLED 0)    # 1: enable, 0: disable
 
 if(OVERCLOCK_ENABLED)
     message(WARNING "Overclocking is enabled. This may damage your device. Use at own risk.")
