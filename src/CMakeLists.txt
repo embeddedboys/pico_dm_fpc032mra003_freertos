@@ -129,7 +129,7 @@ target_compile_definitions(pio_i80 PUBLIC PIO_USE_DMA=${PIO_USE_DMA})
 target_compile_definitions(pio_i80 PUBLIC I80_BUS_WR_CLK_KHZ=${I80_BUS_WR_CLK_KHZ})
 
 # include factory test library here
-add_subdirectory(factory)
+# add_subdirectory(factory)
 
 # user define common source files
 file(GLOB_RECURSE COMMON_SOURCES
@@ -167,7 +167,7 @@ target_link_libraries(${PROJECT_NAME}
     hardware_i2c
     hardware_pwm
     lvgl lvgl::demos lvgl::examples
-    factory_test
+    # factory_test
     )
 
 # add target common defines here
