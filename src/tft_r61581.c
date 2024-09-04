@@ -180,7 +180,8 @@ static struct tft_display r61581 = {
         .write_reg = tft_write_reg8,
         .init_display = tft_r61581_init_display,
         .clear = tft_clear,
-        .video_sync = tft_video_sync,
+        // lvgl's rgb565 swap is better
+        // .video_sync = tft_video_sync,
     },
 };
 
