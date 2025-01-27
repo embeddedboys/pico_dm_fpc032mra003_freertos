@@ -29,7 +29,7 @@ add_subdirectory(src)
 add_custom_target(
     print-memory-usage ALL
     COMMAND arm-none-eabi-size -G src/${CMAKE_PROJECT_NAME}.elf
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/build/src/${CMAKE_PROJECT_NAME}.elf
+    DEPENDS ${CMAKE_BINARY_DIR}/src/${CMAKE_PROJECT_NAME}.elf
     COMMENT "Print target size info"
     DEPENDS ${ProjectName}
 )
